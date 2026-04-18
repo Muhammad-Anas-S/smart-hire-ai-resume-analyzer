@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Analyzer</title>
+    <link rel="Stylesheet" href="style.css">
+    <style>
+        .error { color: red; font-weight: bold; }
+        .note { font-size: 0.9em; color: white; }
+    </style>
+</head>
+<body>
+    <h1>Resume Analyzer</h1>
+    
+    <input type="file" id="resumeFile" accept=".pdf,.doc,.docx">
+    <label for="resumeFile"><span id="ins" class="note">(Only .pdf, .doc, .docx files are allowed)</span></label>
+    <br>
+    <br>
+    <button onclick="uploadResume()">Upload Resume</button>
+    <br>
+    <div id="errorMsg" class="error"></div>
+    <div id="output"></div>
+
+    <script>
+        function uploadResume() {
+            const fileInput = document.getElementById("resumeFile");
+            const errorMsg = document.getElementById("errorMsg");
+            errorMsg.textContent = "";
+
+            if (fileInput.files.length === 0) {
+                errorMsg.textContent = "Please select a file to upload.";
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const validTypes = [
+                'application/pdf',
+                'application/msword',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+            ];
+            if (!validTypes.includes(file.type)) {
+                errorMsg.textContent = "Please upload a valid resume format (PDF, DOC, or DOCX).";
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("file", file);
+
+            fetch("http://localhost:8080/resume/upload", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => displayResults(data))
+            .catch(error => console.error("Error:", error));
+        }
+
+
+    function displayResults(data) {
+    let outputDiv = document.getElementById("output");
+
+    const extractQuestions = (items) => {
+    const removeLeadingNumber = (text) => text.replace(/^\d+\.\s*/, ''); // removes leading "1. ", "2. ", etc.
+
+    if (typeof items === 'object' && !Array.isArray(items)) {
+        return Object.entries(items)
+            .map(([skill, questions]) => {
+                return `${skill}:\n` + questions
+                    .map((q, i) => {
+                        const questionText = typeof q === 'object' && q.question ? q.question : q;
+                        return `  ${i + 1}. ${removeLeadingNumber(questionText)}`;
+                    })
+                    .join("\n");
+            })
+            .join("\n\n");
+    } else if (Array.isArray(items)) {
+        return items
+            .map((q, i) => {
+                const questionText = typeof q === 'object' && q.question ? q.question : q;
+                return `${i + 1}. ${removeLeadingNumber(questionText)}`;
+            })
+            .join("\n\n");
+    }
+
+    return typeof items === 'string' ? items : JSON.stringify(items);
+};
+
+const technicalQuestions = extractQuestions(data["Generated Interview Questions for Technical Skills"]);
+    const softQuestions = extractQuestions(data["Generated Interview Questions for Soft Skills"]);
+
+    outputDiv.innerHTML = `
+        <h3>Extracted Technical Skills:</h3>
+        <pre id="tech-skills">
+${data["Extracted Technical Skills"] && data["Extracted Technical Skills"].length > 0 
+    ? data["Extracted Technical Skills"].join(", ") 
+    : "No technical skills found"}
+        </pre>
+
+        <h3>Extracted Soft Skills:</h3>
+        <pre id="soft-skills">
+${data["Extracted Soft Skills"] && data["Extracted Soft Skills"].length > 0 
+    ? data["Extracted Soft Skills"].join(", ") 
+    : "No soft skills found"}
+        </pre>
+
+        <h3>Generated Interview Questions:</h3>
+
+        <h4>Technical skills questions</h4>
+        <pre style="white-space: pre-wrap; word-wrap: break-word;">
+${technicalQuestions && technicalQuestions.trim().length > 0 
+    ? technicalQuestions 
+    : "No technical interview questions generated"}
+        </pre>
+
+        <h4>Soft skills questions</h4>
+        <pre style="white-space: pre-wrap; word-wrap: break-word;">
+${softQuestions && softQuestions.trim().length > 0 
+    ? softQuestions 
+    : "No soft skill interview questions generated"}
+       </pre>
+`;
+}
+
+
+
+
+
+
+    </script>
+
+</body>
+</html>

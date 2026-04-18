@@ -1,0 +1,49 @@
+body {
+    font-family: 'Arial';
+    text-align: center;
+    margin: 20px;
+    color: #000000;
+    font-weight: bold;
+
+    background-image: url('images/im9.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 100vh;
+}
+
+
+#ins{
+color: #000000;
+font-weight: lighter;
+}
+
+
+#output {
+    margin-top: 20px;
+    text-align: left;
+    background-color: rgba(101, 99, 99, 0.547);
+    padding: 20px;
+    
+}
+
+#tech-skills {
+    color: rgb(0, 58, 248);
+    font-weight: bold;
+}
+
+#soft-skills {
+    color: rgb(0, 58, 248);
+    font-weight: bold;
+}
+
+pre {
+    font-family: 'Arial';
+    color: green;
+    background: rgba(241, 238, 238, 0.79);
+    padding: 10px;
+    border-radius: 5px;
+    color: #000000;
+    white-space:pre-wrap;
+    font-size: large;
+}
