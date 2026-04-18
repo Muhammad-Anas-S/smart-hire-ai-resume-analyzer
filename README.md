@@ -1,4 +1,4 @@
-## SmartHire – AI Resume & Interview Assistant
+# SmartHire – AI Resume & Interview Assistant
 
 ## Description
 SmartHire is an AI-based application that parses resumes and extracts IT skills using NLP techniques. It also generates interview questions based on extracted skills.
